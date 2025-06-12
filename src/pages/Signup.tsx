@@ -30,8 +30,7 @@ export default function Signup() {
         role: "guest",
         createdAt: new Date()
       });
-
-      alert("Account Created and Data Saved to Firestore");
+      alert("Account Created Successfully and Data is Stored in Database");
     } catch (error: any) {
       setError(error.message);
     }
@@ -39,7 +38,8 @@ export default function Signup() {
 
   return (
     <>
-      <div className="container-page">
+      <div className="container">
+        <div className="container-page">
         <h2 className="container-page-heading">Create an Account</h2>
         <InputName value={name} onChange={(e) => setName(e.target.value)} />
         <InputEmail value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -58,6 +58,7 @@ export default function Signup() {
             <NavLink to="/signin">SignIn</NavLink>
           </p>
         </div>
+      </div>
       </div>
     </>
   );

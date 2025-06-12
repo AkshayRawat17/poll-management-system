@@ -43,21 +43,23 @@ export default function Signin() {
 
   return (
     <>
-      <div className="container-page">
-        <h2 className="container-page-heading">Sign In Your Account</h2>
+      <div className="container">
+        <div className="container-page">
+          <h2 className="container-page-heading">Sign In Your Account</h2>
 
-        <InputEmail value={email} onChange={(e) => setEmail(e.target.value)} />
-        <InputPassword value={password} onChange={(e) => setPassword(e.target.value)} />
+          <InputEmail value={email} onChange={(e) => setEmail(e.target.value)} />
+          <InputPassword value={password} onChange={(e) => setPassword(e.target.value)} />
 
-        {error && <p className="error-message">{error}</p>}
+          {error && <p className="error-message">{error}</p>}
 
-        <ButtonComponent title="Sign In" onClick={handleSignin} />
+          <ButtonComponent title="Sign In" onClick={handleSignin} />
 
-        <div className="already-container">
-          <p>Don’t have an Account?</p>
-          <p className="signin-link">
-            <NavLink to="/">Sign Up</NavLink>
-          </p>
+          <div className="already-container">
+            <p>Don’t have an Account?</p>
+            <p className="signin-link">
+              <NavLink to="/">Sign Up</NavLink>
+            </p>
+          </div>
         </div>
       </div>
     </>
