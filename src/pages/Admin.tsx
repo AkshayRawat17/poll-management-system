@@ -1,65 +1,75 @@
-import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
-import Button from '@mui/material/Button';
-import { NavLink } from "react-router-dom";
-import NavbarAdmin from "../components/NavbarAdmin";
+import React, { useEffect, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
+import { Box, Typography, LinearProgress } from '@mui/material';
+import NavbarAdmin from '../components/NavbarAdmin';
 
-interface User {
+interface Poll {
     id: string;
-    name: string;
-    email: string;
+    question: string;
+    options: string[];
+    votes: Record<string, number>;
 }
 
-export default function UsersList() {
-    const [allUsers, setAllUsers] = useState<User[]>([]);
+function LinearProgressWithLabel({ value }: { value: number }) {
+    return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ width: '100%', mr: 1 }}>
+                <LinearProgress variant="determinate" value={value} />
+            </Box>
+            <Box sx={{ minWidth: 35 }}>
+                <Typography variant="body2" color="text.secondary">{`${Math.round(value)}%`}</Typography>
+            </Box>
+        </Box>
+    );
+}
+
+export default function Admin() {
+    const [polls, setPolls] = useState<Poll[]>([]);
 
     useEffect(() => {
-        const fetchUsers = async () => {
-            const usersCollection = collection(db, "users");
-            const snap = await getDocs(usersCollection);
-            const usersData = snap.docs.map(doc => ({
+        const fetchPolls = async () => {
+            const snapshot = await getDocs(collection(db, 'polls'));
+            const pollsData = snapshot.docs.map((doc) => ({
                 id: doc.id,
-                ...doc.data(),
-            })).filter((user: any) => user.role !== "admin") as User[];
-            setAllUsers(usersData);
+                ...doc.data()
+            })) as Poll[];
+            setPolls(pollsData);
         };
-        fetchUsers();
+
+        fetchPolls();
     }, []);
 
     return (
         <>
-        <NavbarAdmin />
-            <div className="table-container">
-                <h2 className="table-user">All Users</h2>
-                <div className="table">
-                    {
-                        allUsers.length ?
-                            <>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            allUsers.map(user => (
-                                                <tr key={user.id}>
-                                                    <td>{user.id}</td>
-                                                    <td>{user.name}</td>
-                                                    <td>{user.email}</td>
-                                                </tr>
-                                            ))}
-                                    </tbody>
-                                </table>
-                            </> : null
-                    }
-                </div>
-            </div>
+            <NavbarAdmin />
+            <Box sx={{ p: 3 }}>
+                <Typography variant="h4" gutterBottom>
+                    Admin Polls
+                </Typography>
+
+                {polls.map((poll) => {
+                    const totalVotes = Object.values(poll.votes || {}).reduce((a, b) => a + b, 0);
+
+                    return (
+                        <Box key={poll.id} sx={{ mb: 4 }}>
+                            <Typography variant="h6" gutterBottom>
+                                {poll.question}
+                            </Typography>
+                            {poll.options.map((option, index) => {
+                                const voteCount = poll.votes?.[option] || 0;
+                                const percentage = totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0;
+                                return (
+                                    <Box key={index} sx={{ mb: 1 }}>
+                                        <Typography variant="body1">{option}</Typography>
+                                        <LinearProgressWithLabel value={percentage} />
+                                    </Box>
+                                );
+                            })}
+                        </Box>
+                    );
+                })}
+            </Box>
         </>
     );
 }
-

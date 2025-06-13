@@ -25,6 +25,12 @@ export default function CreatePoll() {
         setOptions([...options, { id: Date.now(), text: '' }]);
     };
 
+    const removeOption = () => {
+        if (options.length > 2) {
+            setOptions(options.slice(0, -1));
+        }
+    }
+
     const handleSubmit = async () => {
         if (!question.trim() || options.some(opt => !opt.text.trim())) {
             alert("Please fill in all fields");
@@ -66,9 +72,9 @@ export default function CreatePoll() {
                         onChange={(e) => handleOptionChange(index, e.target.value)}
                     />
                 ))}
-                {/* <button type="button" onClick={addOption}>Add Option</button> */}
                 <ButtonComponent title="Add Options" onClick={addOption} />
-                {/* <button type="submit">Create Poll</button> */}
+                {/* <ButtonComponent title="Remove Option" onClick={removeOption} /> */}
+                <button className='remove-options' onClick={removeOption}>REMOVE OPTIONS</button>
                 <ButtonComponent title="Create Poll" onClick={handleSubmit} />
             </form>
         </div>

@@ -14,10 +14,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Signup />} />
           <Route path="/guest" element={<Guest />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin-dashboard" element={<Admin />} />
           <Route path="/signin" element={<Signin />} />
-          <Route path="/admin/create-poll" element={<CreatePoll />} />
-          <Route path="/admin/result" element={<PollResult />} />
+          <Route path="/admin-dashboard/create-poll" element={<CreatePoll />} />
+          <Route path="/admin-dashboard/result" element={<PollResult />} />
         </Routes>
       </BrowserRouter>
     </>
