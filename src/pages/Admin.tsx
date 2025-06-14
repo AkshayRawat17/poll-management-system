@@ -1,75 +1,105 @@
-import React, { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
-import { Box, Typography, LinearProgress } from '@mui/material';
-import NavbarAdmin from '../components/NavbarAdmin';
+import { useEffect, useState } from "react";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
+import { Box, Typography, LinearProgress } from "@mui/material";
+import NavbarAdmin from "../components/NavbarAdmin";
+
+interface Option {
+    text: string;
+    votes: number;
+}
 
 interface Poll {
     id: string;
-    question: string;
-    options: string[];
-    votes: Record<string, number>;
+    name: string;
+    options: Option[];
 }
 
 function LinearProgressWithLabel({ value }: { value: number }) {
     return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box sx={{ width: '100%', mr: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box sx={{ width: "100%", mr: 1 }}>
                 <LinearProgress variant="determinate" value={value} />
             </Box>
             <Box sx={{ minWidth: 35 }}>
-                <Typography variant="body2" color="text.secondary">{`${Math.round(value)}%`}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                    {`${Math.round(value)}%`}
+                </Typography>
             </Box>
         </Box>
     );
 }
 
-export default function Admin() {
+export default function DashBoard() {
     const [polls, setPolls] = useState<Poll[]>([]);
 
     useEffect(() => {
-        const fetchPolls = async () => {
-            const snapshot = await getDocs(collection(db, 'polls'));
-            const pollsData = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Poll[];
-            setPolls(pollsData);
-        };
+        const unsubscribe = onSnapshot(collection(db, "polls"), (snapshot) => {
+            const pollData: Poll[] = snapshot.docs.map((docSnap) => {
+                const data = docSnap.data();
+                const votesMap = data.votes || {};
 
-        fetchPolls();
+                const options: Option[] = Array.isArray(data.options)
+                    ? data.options.map((opt: any) => {
+                        const rawVotes = votesMap[opt.text] || 0;
+                        const safeVotes = Math.max(0, rawVotes);
+                        return {
+                            text: opt.text,
+                            votes: safeVotes,
+                        };
+                    })
+                    : [];
+
+                return {
+                    id: docSnap.id,
+                    name: data.question || data.name || "Untitled Poll",
+                    options,
+                };
+            });
+
+            setPolls(pollData);
+        });
+
+        return () => unsubscribe();
     }, []);
 
     return (
         <>
             <NavbarAdmin />
-            <Box sx={{ p: 3 }}>
-                <Typography variant="h4" gutterBottom>
-                    Admin Polls
-                </Typography>
+            <div className="container">
+                <div className="container-page">
+                    <Typography variant="h4" gutterBottom className="dashboard-header">
+                        Poll Status
+                    </Typography>
+                    {polls.map((poll) => {
+                        const totalVotes = poll.options.reduce(
+                            (sum, opt) => sum + Math.max(0, opt.votes),
+                            0
+                        ) || 1;
 
-                {polls.map((poll) => {
-                    const totalVotes = Object.values(poll.votes || {}).reduce((a, b) => a + b, 0);
+                        return (
+                            <div key={poll.id} className="poll-card">
+                                <Typography variant="h6" className="poll-title">
+                                    {poll.name}
+                                </Typography>
+                                {poll.options.map((option) => {
+                                    const votes = Math.max(0, option.votes);
+                                    const percent = (votes / totalVotes) * 100;
 
-                    return (
-                        <Box key={poll.id} sx={{ mb: 4 }}>
-                            <Typography variant="h6" gutterBottom>
-                                {poll.question}
-                            </Typography>
-                            {poll.options.map((option, index) => {
-                                const voteCount = poll.votes?.[option] || 0;
-                                const percentage = totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0;
-                                return (
-                                    <Box key={index} sx={{ mb: 1 }}>
-                                        <Typography variant="body1">{option}</Typography>
-                                        <LinearProgressWithLabel value={percentage} />
-                                    </Box>
-                                );
-                            })}
-                        </Box>
-                    );
-                })}
-            </Box>
+                                    return (
+                                        <Box key={option.text} sx={{ mb: 2 }}>
+                                            <Typography variant="body1" className="option-label">
+                                                {option.text} ({votes} votes)
+                                            </Typography>
+                                            <LinearProgressWithLabel value={percent} />
+                                        </Box>
+                                    );
+                                })}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
         </>
     );
 }

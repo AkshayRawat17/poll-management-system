@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { db } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import ButtonComponent from "../components/ButtonComponent";
+import { useNavigate } from 'react-router-dom';
 
 interface PollOption {
     id: number;
@@ -14,6 +15,8 @@ export default function CreatePoll() {
         { id: 1, text: '' },
         { id: 2, text: '' }
     ]);
+
+    const navigate = useNavigate()
 
     const handleOptionChange = (index: number, value: string) => {
         const newOptions = [...options];
@@ -48,6 +51,7 @@ export default function CreatePoll() {
             alert("New Poll Created");
             setQuestion('');
             setOptions([{ id: 1, text: '' }, { id: 2, text: '' }]);
+            navigate("/admin-dashboard")
         } catch (error) {
             console.error("Error adding poll: ", error);
         }
@@ -73,7 +77,6 @@ export default function CreatePoll() {
                     />
                 ))}
                 <ButtonComponent title="Add Options" onClick={addOption} />
-                {/* <ButtonComponent title="Remove Option" onClick={removeOption} /> */}
                 <button className='remove-options' onClick={removeOption}>REMOVE OPTIONS</button>
                 <ButtonComponent title="Create Poll" onClick={handleSubmit} />
             </form>
