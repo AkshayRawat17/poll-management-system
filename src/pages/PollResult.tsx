@@ -16,7 +16,7 @@ interface Poll {
   options: Option[];
 }
 
-export default function Result() {
+export default function PollResult() {
   const [polls, setPolls] = useState<Poll[]>([]);
   const navigate = useNavigate();
 

@@ -30,7 +30,7 @@ function LinearProgressWithLabel({ value }: { value: number }) {
     );
 }
 
-export default function DashBoard() {
+export default function Admin() {
     const [polls, setPolls] = useState<Poll[]>([]);
 
     useEffect(() => {
