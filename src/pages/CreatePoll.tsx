@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { db } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import ButtonComponent from "../components/ButtonComponent";
+import { useNavigate } from 'react-router-dom';
 
 interface PollOption {
     id: number;
@@ -15,6 +16,8 @@ export default function CreatePoll() {
         { id: 2, text: '' }
     ]);
 
+    const navigate = useNavigate()
+
     const handleOptionChange = (index: number, value: string) => {
         const newOptions = [...options];
         newOptions[index].text = value;
@@ -24,6 +27,12 @@ export default function CreatePoll() {
     const addOption = () => {
         setOptions([...options, { id: Date.now(), text: '' }]);
     };
+
+    const removeOption = () => {
+        if (options.length > 2) {
+            setOptions(options.slice(0, -1));
+        }
+    }
 
     const handleSubmit = async () => {
         if (!question.trim() || options.some(opt => !opt.text.trim())) {
@@ -42,6 +51,7 @@ export default function CreatePoll() {
             alert("New Poll Created");
             setQuestion('');
             setOptions([{ id: 1, text: '' }, { id: 2, text: '' }]);
+            navigate("/admin-dashboard")
         } catch (error) {
             console.error("Error adding poll: ", error);
         }
@@ -66,9 +76,8 @@ export default function CreatePoll() {
                         onChange={(e) => handleOptionChange(index, e.target.value)}
                     />
                 ))}
-                {/* <button type="button" onClick={addOption}>Add Option</button> */}
                 <ButtonComponent title="Add Options" onClick={addOption} />
-                {/* <button type="submit">Create Poll</button> */}
+                <button className='remove-options' onClick={removeOption}>REMOVE OPTIONS</button>
                 <ButtonComponent title="Create Poll" onClick={handleSubmit} />
             </form>
         </div>

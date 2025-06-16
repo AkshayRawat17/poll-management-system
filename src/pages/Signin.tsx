@@ -29,7 +29,7 @@ export default function Signin() {
         const userData = userDoc.data();
 
         if (userData.role === "admin") {
-          navigate("/admin");
+          navigate("/admin-dashboard");
         } else {
           navigate("/guest");
         }

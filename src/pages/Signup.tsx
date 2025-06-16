@@ -31,6 +31,9 @@ export default function Signup() {
         createdAt: new Date()
       });
       alert("Account Created Successfully and Data is Stored in Database");
+      setName("")
+      setEmail("")
+      setPassword("")
     } catch (error: any) {
       setError(error.message);
     }
@@ -40,25 +43,25 @@ export default function Signup() {
     <>
       <div className="container">
         <div className="container-page">
-        <h2 className="container-page-heading">Create an Account</h2>
-        <InputName value={name} onChange={(e) => setName(e.target.value)} />
-        <InputEmail value={email} onChange={(e) => setEmail(e.target.value)} />
-        <InputPassword
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <h2 className="container-page-heading">Create an Account</h2>
+          <InputName value={name} onChange={(e) => setName(e.target.value)} />
+          <InputEmail value={email} onChange={(e) => setEmail(e.target.value)} />
+          <InputPassword
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-        {error && <p className="error-message">{error}</p>}
+          {error && <p className="error-message">{error}</p>}
 
-        <ButtonComponent title="Sign Up" onClick={handleSignup} />
+          <ButtonComponent title="Sign Up" onClick={handleSignup} />
 
-        <div className="already-container">
-          <p>Already have an Account?</p>
-          <p className="signin-link">
-            <NavLink to="/signin">SignIn</NavLink>
-          </p>
+          <div className="already-container">
+            <p>Already have an Account?</p>
+            <p className="signin-link">
+              <NavLink to="/signin">SignIn</NavLink>
+            </p>
+          </div>
         </div>
-      </div>
       </div>
     </>
   );
